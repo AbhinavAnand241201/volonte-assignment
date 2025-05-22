@@ -1,5 +1,5 @@
 // Defining the task schema with validation for our task board
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema({
   taskHeading: {
@@ -31,4 +31,4 @@ const taskSchema = new mongoose.Schema({
 });
 
 // Export the model for use in controllers
-export default mongoose.model('Task', taskSchema); 
+module.exports = mongoose.model('Task', taskSchema); 

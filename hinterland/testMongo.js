@@ -1,6 +1,6 @@
 // Trying to connect to MongoDB to ensure our URI and setup work
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
 // Load environment variables
 dotenv.config();

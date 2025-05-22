@@ -2,7 +2,7 @@
 const { body, param, query, validationResult } = require('express-validator');
 
 // Validation middleware for task creation
-export const validateCreateTask = [
+const validateCreateTask = [
   body('taskHeading')
     .trim()
     .notEmpty()
@@ -36,7 +36,7 @@ export const validateCreateTask = [
 ];
 
 // Validation middleware for task update
-export const validateUpdateTask = [
+const validateUpdateTask = [
   param('id')
     .isMongoId()
     .withMessage('Invalid task ID'),
@@ -72,7 +72,7 @@ export const validateUpdateTask = [
 ];
 
 // Validation middleware for query parameters
-export const validateQueryParams = [
+const validateQueryParams = [
   query('page')
     .optional()
     .isInt({ min: 1 })
@@ -105,3 +105,9 @@ export const validateQueryParams = [
     next();
   }
 ]; 
+
+module.exports = {
+  validateCreateTask,
+  validateUpdateTask,
+  validateQueryParams
+};

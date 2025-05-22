@@ -1,30 +1,41 @@
-import React from 'react';
-// Grouping tasks by status for the Kanban view
 import { useState, useEffect } from 'react';
 import { fetchTasks } from '../services/taskService';
 import TaskItem from './TaskItem';
+import TaskForm from './TaskForm';
 
 function TaskPanel() {
   const [taskList, setTaskList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch tasks on component mount
-  useEffect(() => {
-    async function loadTasks() {
-      try {
-        const tasks = await fetchTasks();
-        setTaskList(tasks);
-        setIsLoading(false);
-      } catch (error) {
-        // Log error for debugging
-        console.error('Error loading tasks:', error);
-        setIsLoading(false);
-      }
+  const loadTasks = async () => {
+    try {
+      const response = await fetchTasks();
+      // Check if the response contains a tasks property (from pagination)
+      const tasks = response.tasks || response;
+      setTaskList(tasks);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadTasks();
   }, []);
 
-  // Group tasks by status
+  const handleAddTask = (newTask) => {
+    setTaskList(prev => [...prev, newTask]);
+  };
+
+  const handleUpdateTask = (updatedTask) => {
+    setTaskList(prev => prev.map(task => task._id === updatedTask._id ? updatedTask : task));
+  };
+
+  const handleDeleteTask = (taskId) => {
+    setTaskList(prev => prev.filter(task => task._id !== taskId));
+  };
+
   const statusGroups = {
     'To Do': taskList.filter(t => t.taskStatus === 'To Do'),
     'In Progress': taskList.filter(t => t.taskStatus === 'In Progress'),
@@ -38,48 +49,36 @@ function TaskPanel() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Task Board</h1>
-          <p className="mt-2 text-sm text-gray-600">Manage your tasks efficiently</p>
+    <div>
+      <TaskForm onSubmit={handleAddTask} />
+      {isLoading ? (
+        <p className="text-gray-500">Loading tasks...</p>
+      ) : (
+        <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
+          {['To Do', 'In Progress', 'Done'].map(status => (
+            <div 
+              key={status} 
+              className={`flex-1 p-4 rounded-lg shadow-md max-h-[70vh] overflow-y-auto border ${columnColors[status]}`}
+            >
+              {statusGroups[status].length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                  <span className="text-3xl mb-2">{status === 'To Do' ? '📋' : status === 'In Progress' ? '⏳' : '✅'}</span>
+                  <p>No tasks</p>
+                </div>
+              ) : (
+                statusGroups[status].map(task => (
+                  <TaskItem
+                    key={task._id}
+                    taskItem={task}
+                    onUpdate={handleUpdateTask}
+                    onDelete={handleDeleteTask}
+                  />
+                ))
+              )}
+            </div>
+          ))}
         </div>
-        
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {['To Do', 'In Progress', 'Done'].map(status => (
-              <div 
-                key={status} 
-                className={`${columnColors[status]} rounded-lg shadow-sm border-2 min-h-[500px] p-4 transition-all duration-200 hover:shadow-md`}
-                data-status={status}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-800">{status}</h2>
-                  <span className="px-2 py-1 text-xs font-medium rounded-full bg-white shadow-sm">
-                    {statusGroups[status].length}
-                  </span>
-                </div>
-                
-                <div className="space-y-3">
-                  {statusGroups[status].length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 bg-white rounded-lg shadow-sm">
-                      <p>No tasks</p>
-                    </div>
-                  ) : (
-                    statusGroups[status].map(task => (
-                      <TaskItem key={task._id} taskItem={task} />
-                    ))
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

@@ -1,18 +1,31 @@
 // Main server file
-import express from 'express';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import taskRoutes from './routes/taskRoutes.js';
-import { securityMiddleware } from './middleware/security.js';
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const taskRoutes = require('./routes/taskRoutes');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3333; // Changed to 3333 to avoid port conflicts
 
 // Apply security middleware
-app.use(securityMiddleware);
+app.use(helmet());
+app.use(cors());
+
+// Configure rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { errorMessage: 'Too many requests, please try again later.' }
+});
+app.use(limiter);
 
 // Parse JSON bodies
 app.use(express.json({ limit: '10kb' }));
@@ -36,22 +49,34 @@ process.on('unhandledRejection', (err) => {
 });
 
 // Connect to MongoDB with retry logic
-const connectDB = async (retries = 5) => {
+const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
+    // Use MongoDB Memory Server for development
+    const { MongoMemoryServer } = require('mongodb-memory-server');
+    const mongod = await MongoMemoryServer.create();
+    const uri = mongod.getUri();
+    
+    console.log('Connecting to in-memory MongoDB...');
+    await mongoose.connect(uri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000
+      useUnifiedTopology: true
     });
-    console.log('MongoDB connected successfully');
+    console.log('Connected to in-memory MongoDB successfully');
+    
+    // Store the mongod instance to close it when the server shuts down
+    global.__MONGOD__ = mongod;
+    
+    // Set up a cleanup handler
+    process.on('SIGINT', async () => {
+      if (global.__MONGOD__) {
+        await global.__MONGOD__.stop();
+        console.log('In-memory MongoDB server stopped');
+      }
+      process.exit(0);
+    });
   } catch (error) {
-    if (retries > 0) {
-      console.error(`MongoDB connection failed. Retrying... (${retries} attempts left)`);
-      setTimeout(() => connectDB(retries - 1), 5000);
-    } else {
-      console.error('MongoDB connection failed after all retries:', error);
-      process.exit(1);
-    }
+    console.error('Failed to start MongoDB:', error);
+    process.exit(1);
   }
 };
 
