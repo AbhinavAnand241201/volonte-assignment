@@ -1,10 +1,14 @@
 import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
+import taskRoutes from '../routes/taskRoutes.js';
 
 // Create a minimal Express app for testing
 const appInstance = express();
 appInstance.use(cors());
+appInstance.use(express.json());
+appInstance.use('/api/tasks', taskRoutes);
+
 appInstance.get('/api/health', (req, res) => {
   res.status(200).json({ serverStatus: 'Hinterland is operational' });
 });

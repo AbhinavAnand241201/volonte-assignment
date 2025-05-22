@@ -1,9 +1,9 @@
 // Handling task-related logic
-import Task from '../models/Task.js';
-import mongoose from 'mongoose';
+const Task = require('../models/Task');
+const mongoose = require('mongoose');
 
 // Fetch all tasks from the database with pagination and sorting
-export const fetchAllTasks = async (req, res) => {
+const getAllTasks = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -52,7 +52,7 @@ export const fetchAllTasks = async (req, res) => {
 };
 
 // Create a new task with validation
-export const createNewTask = async (req, res) => {
+const createTask = async (req, res) => {
   try {
     // Validating input before saving to avoid bad data
     const { taskHeading, taskDetails, taskStatus, taskPriority, dueDate } = req.body;
@@ -81,7 +81,7 @@ export const createNewTask = async (req, res) => {
 };
 
 // Retrieve a single task by ID
-export const getTaskById = async (req, res) => {
+const getTaskById = async (req, res) => {
   try {
     // Checking ID validity to prevent MongoDB errors
     const { id } = req.params;
@@ -101,7 +101,7 @@ export const getTaskById = async (req, res) => {
 };
 
 // Update an existing task
-export const updateTask = async (req, res) => {
+const updateTask = async (req, res) => {
   try {
     // Checking ID validity to prevent MongoDB errors
     const { id } = req.params;
@@ -130,7 +130,7 @@ export const updateTask = async (req, res) => {
 };
 
 // Delete a task by ID
-export const deleteTask = async (req, res) => {
+const deleteTask = async (req, res) => {
   try {
     // Ensuring task exists before deletion to avoid errors
     const { id } = req.params;
@@ -147,4 +147,12 @@ export const deleteTask = async (req, res) => {
   } catch (error) {
     res.status(500).json({ errorMessage: 'Failed to delete task' });
   }
+};
+
+module.exports = {
+  getAllTasks,
+  createTask,
+  getTaskById,
+  updateTask,
+  deleteTask
 }; 

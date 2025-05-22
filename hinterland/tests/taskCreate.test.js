@@ -1,10 +1,10 @@
-import request from 'supertest';
-import mongoose from 'mongoose';
-import express from 'express';
-import cors from 'cors';
-import taskRoutes from '../routes/taskRoutes.js';
-import Task from '../models/Task.js';
-import dotenv from 'dotenv';
+const request = require('supertest');
+const mongoose = require('mongoose');
+const express = require('express');
+const cors = require('cors');
+const taskRoutes = require('../routes/taskRoutes');
+const Task = require('../models/Task');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
