@@ -1,0 +1,17 @@
+{
+  "name": "task-board",
+  "version": "1.0.0",
+  "description": "A MERN stack task management application",
+  "scripts": {
+    "install:all": "npm install && cd task-board/hinterland && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd task-board/hinterland && npm run dev",
+    "dev:frontend": "cd task-board/frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "test:backend": "cd task-board/hinterland && npm test",
+    "test:frontend": "cd task-board/frontend && npm test",
+    "test": "npm run test:backend && npm run test:frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+} 
