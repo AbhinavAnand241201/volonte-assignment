@@ -25,6 +25,6 @@ git commit -m "Task Board Application - Enhanced Version"
 
 # Push to GitHub
 echo "Pushing to GitHub..."
-git push -u origin master
+git push -u origin main
 
 echo "Done! Check your GitHub repository at https://github.com/AbhinavAnand241201/volonte-assignment"
