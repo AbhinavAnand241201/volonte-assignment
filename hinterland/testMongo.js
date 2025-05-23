@@ -5,8 +5,11 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config();
 
+// MongoDB connection string
+const mongoURI = process.env.MONGO_URI || 'mongodb+srv://letsfkingo07:CtokNVH3iVcrUYPz@cluster009099.djatxzd.mongodb.net/';
+
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })

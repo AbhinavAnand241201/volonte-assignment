@@ -1,4 +1,9 @@
-// Main server file
+/**
+ * Task Board API Server
+ * Main server file that configures Express, connects to MongoDB,
+ * and sets up routes and middleware for the Task Board application.
+ */
+
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -6,6 +11,7 @@ const taskRoutes = require('./routes/taskRoutes');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 // Load environment variables
 dotenv.config();
@@ -48,45 +54,81 @@ process.on('unhandledRejection', (err) => {
   // Don't crash the server, but log the error
 });
 
-// Connect to MongoDB with retry logic
+/**
+ * Connect to MongoDB with retry logic
+ * Establishes connection to MongoDB Atlas using connection string from environment variables
+ * Sets up event listeners for connection events
+ */
 const connectDB = async () => {
   try {
-    // Use MongoDB Memory Server for development
-    const { MongoMemoryServer } = require('mongodb-memory-server');
-    const mongod = await MongoMemoryServer.create();
-    const uri = mongod.getUri();
+    // Use MongoDB Atlas connection string from environment variables or fallback to the provided string
+    // NOTE: In production, always use environment variables for sensitive information
+    const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://letsfkingo07:CtokNVH3iVcrUYPz@cluster009099.djatxzd.mongodb.net/task-board';
     
-    console.log('Connecting to in-memory MongoDB...');
-    await mongoose.connect(uri, {
+    console.log('Connecting to MongoDB Atlas...');
+    await mongoose.connect(MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-    console.log('Connected to in-memory MongoDB successfully');
+    console.log('Connected to MongoDB Atlas successfully');
     
-    // Store the mongod instance to close it when the server shuts down
-    global.__MONGOD__ = mongod;
+    // Set up MongoDB connection event listeners
+    mongoose.connection.on('error', err => {
+      console.error('MongoDB connection error:', err);
+    });
+    
+    mongoose.connection.on('disconnected', () => {
+      console.warn('MongoDB disconnected. Attempting to reconnect...');
+    });
     
     // Set up a cleanup handler
-    process.on('SIGINT', async () => {
-      if (global.__MONGOD__) {
-        await global.__MONGOD__.stop();
-        console.log('In-memory MongoDB server stopped');
-      }
-      process.exit(0);
+    process.on('SIGINT', () => {
+      mongoose.connection.close(() => {
+        console.log('MongoDB connection closed');
+        process.exit(0);
+      });
     });
   } catch (error) {
-    console.error('Failed to start MongoDB:', error);
+    console.error('Failed to connect to MongoDB Atlas:', error);
     process.exit(1);
   }
 };
 
-// Start server
+/**
+ * Start the Express server
+ * Connects to MongoDB and starts listening on the configured port
+ */
 const startServer = async () => {
   try {
+    // Connect to MongoDB first
     await connectDB();
-    app.listen(PORT, () => {
+    
+    // Create HTTP server
+    const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+      console.log(`API available at http://localhost:${PORT}/api/tasks`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     });
+    
+    // Handle server errors
+    server.on('error', (error) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Please use a different port.`);
+      } else {
+        console.error('Server error:', error);
+      }
+      process.exit(1);
+    });
+    
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received. Shutting down gracefully...');
+      server.close(() => {
+        console.log('Server closed.');
+        process.exit(0);
+      });
+    });
+    
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

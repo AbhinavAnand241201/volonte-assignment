@@ -1,8 +1,17 @@
-// Handling task-related logic
+/**
+ * Task Controller
+ * Handles all task-related operations including CRUD operations
+ * and business logic for the Task Board application.
+ */
 const Task = require('../models/Task');
 const mongoose = require('mongoose');
 
-// Fetch all tasks from the database with pagination and sorting
+/**
+ * Get all tasks with filtering, pagination and sorting
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with tasks and pagination metadata
+ */
 const getAllTasks = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -51,7 +60,12 @@ const getAllTasks = async (req, res) => {
   }
 };
 
-// Create a new task with validation
+/**
+ * Create a new task
+ * @param {Object} req - Express request object with task data in body
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with created task or error message
+ */
 const createTask = async (req, res) => {
   try {
     // Validating input before saving to avoid bad data
@@ -80,7 +94,12 @@ const createTask = async (req, res) => {
   }
 };
 
-// Retrieve a single task by ID
+/**
+ * Get a single task by ID
+ * @param {Object} req - Express request object with task ID in params
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with task data or error message
+ */
 const getTaskById = async (req, res) => {
   try {
     // Checking ID validity to prevent MongoDB errors
@@ -100,7 +119,12 @@ const getTaskById = async (req, res) => {
   }
 };
 
-// Update an existing task
+/**
+ * Update an existing task
+ * @param {Object} req - Express request object with task ID in params and updated data in body
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with updated task or error message
+ */
 const updateTask = async (req, res) => {
   try {
     // Checking ID validity to prevent MongoDB errors
@@ -129,7 +153,12 @@ const updateTask = async (req, res) => {
   }
 };
 
-// Delete a task by ID
+/**
+ * Delete a task by ID
+ * @param {Object} req - Express request object with task ID in params
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with success message or error message
+ */
 const deleteTask = async (req, res) => {
   try {
     // Ensuring task exists before deletion to avoid errors
