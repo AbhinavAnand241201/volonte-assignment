@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+hinterland/node_modules/
+
+# Environment variables
+.env
+frontend/.env
+hinterland/.env
+
+# Build outputs
+dist/
+build/
+frontend/dist/
+hinterland/dist/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# OS files
+.DS_Store
+Thumbs.db 
