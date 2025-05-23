@@ -1,6 +1,6 @@
 /**
  * Task Model
- * Defines the schema and methods for tasks in the Task Board application
+ * I define the schema and methods for tasks in the Task Board application
  * @module models/Task
  */
 const mongoose = require('mongoose');
@@ -65,7 +65,7 @@ const taskSchema = new mongoose.Schema({
   creationDate: {
     type: Date,
     default: Date.now,
-    immutable: true // Once set, cannot be changed
+    immutable: true // I ensure this field cannot be changed once set
   },
   
   /**
@@ -77,17 +77,17 @@ const taskSchema = new mongoose.Schema({
     type: Date,
     validate: {
       validator: function(value) {
-        // Due date can be null/undefined (optional) or must be a future date
+        // I ensure the due date is either null/undefined or a future date
         return !value || value > new Date();
       },
       message: 'Due date must be in the future'
     }
   }
 }, {
-  // Add timestamps for when documents are created or updated
+  // I add timestamps for when documents are created or updated
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
   
-  // Add virtual properties when converting to JSON
+  // I add virtual properties when converting to JSON
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
@@ -105,7 +105,7 @@ taskSchema.virtual('isOverdue').get(function() {
  * Pre-save middleware to validate data before saving
  */
 taskSchema.pre('save', function(next) {
-  // Additional validation can be added here
+  // I can add additional validation here if needed
   next();
 });
 

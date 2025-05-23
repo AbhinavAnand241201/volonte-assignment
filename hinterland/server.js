@@ -1,6 +1,6 @@
 /**
  * Task Board API Server
- * Main server file that configures Express, connects to MongoDB,
+ * I am the main server file that configures Express, connects to MongoDB,
  * and sets up routes and middleware for the Task Board application.
  */
 
@@ -13,33 +13,33 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
-// Load environment variables
+// I load environment variables from .env file
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3333; // Changed to 3333 to avoid port conflicts
+const PORT = process.env.PORT || 3333; // I changed to 3333 to avoid port conflicts
 
-// Apply security middleware
+// I apply security middleware to protect the API
 app.use(helmet());
 app.use(cors());
 
-// Configure rate limiting
+// I configure rate limiting to prevent abuse
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 100, // I limit each IP to 100 requests per windowMs
   standardHeaders: true,
   legacyHeaders: false,
   message: { errorMessage: 'Too many requests, please try again later.' }
 });
 app.use(limiter);
 
-// Parse JSON bodies
+// I parse JSON bodies with a size limit of 10kb
 app.use(express.json({ limit: '10kb' }));
 
-// Routes
+// I set up routes for task-related endpoints
 app.use('/api/tasks', taskRoutes);
 
-// Error handling middleware
+// I handle errors globally
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
@@ -48,21 +48,21 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Handle unhandled promise rejections
+// I handle unhandled promise rejections to prevent crashes
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Promise Rejection:', err);
-  // Don't crash the server, but log the error
+  // I don't crash the server, but log the error
 });
 
 /**
- * Connect to MongoDB with retry logic
- * Establishes connection to MongoDB Atlas using connection string from environment variables
- * Sets up event listeners for connection events
+ * I connect to MongoDB with retry logic
+ * I establish a connection to MongoDB Atlas using the connection string from environment variables
+ * I set up event listeners for connection events
  */
 const connectDB = async () => {
   try {
-    // Use MongoDB Atlas connection string from environment variables or fallback to the provided string
-    // NOTE: In production, always use environment variables for sensitive information
+    // I use MongoDB Atlas connection string from environment variables or fallback to the provided string
+    // NOTE: In production, I always use environment variables for sensitive information
     const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://letsfkingo07:CtokNVH3iVcrUYPz@cluster009099.djatxzd.mongodb.net/task-board';
     
     console.log('Connecting to MongoDB Atlas...');
@@ -72,7 +72,7 @@ const connectDB = async () => {
     });
     console.log('Connected to MongoDB Atlas successfully');
     
-    // Set up MongoDB connection event listeners
+    // I set up MongoDB connection event listeners
     mongoose.connection.on('error', err => {
       console.error('MongoDB connection error:', err);
     });
@@ -81,7 +81,7 @@ const connectDB = async () => {
       console.warn('MongoDB disconnected. Attempting to reconnect...');
     });
     
-    // Set up a cleanup handler
+    // I set up a cleanup handler
     process.on('SIGINT', () => {
       mongoose.connection.close(() => {
         console.log('MongoDB connection closed');
@@ -95,22 +95,22 @@ const connectDB = async () => {
 };
 
 /**
- * Start the Express server
- * Connects to MongoDB and starts listening on the configured port
+ * I start the Express server
+ * I connect to MongoDB and start listening on the configured port
  */
 const startServer = async () => {
   try {
-    // Connect to MongoDB first
+    // I connect to MongoDB first
     await connectDB();
     
-    // Create HTTP server
+    // I create an HTTP server
     const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`API available at http://localhost:${PORT}/api/tasks`);
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     });
     
-    // Handle server errors
+    // I handle server errors
     server.on('error', (error) => {
       if (error.code === 'EADDRINUSE') {
         console.error(`Port ${PORT} is already in use. Please use a different port.`);
@@ -120,7 +120,7 @@ const startServer = async () => {
       process.exit(1);
     });
     
-    // Graceful shutdown
+    // I handle graceful shutdown
     process.on('SIGTERM', () => {
       console.log('SIGTERM received. Shutting down gracefully...');
       server.close(() => {

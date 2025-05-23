@@ -1,7 +1,7 @@
-// Request validation middleware
+// I define request validation middleware
 const { body, param, query, validationResult } = require('express-validator');
 
-// Validation middleware for task creation
+// I define validation middleware for task creation
 const validateCreateTask = [
   body('taskHeading')
     .trim()
@@ -35,7 +35,7 @@ const validateCreateTask = [
   }
 ];
 
-// Validation middleware for task update
+// I define validation middleware for task update
 const validateUpdateTask = [
   param('id')
     .isMongoId()
@@ -71,7 +71,7 @@ const validateUpdateTask = [
   }
 ];
 
-// Validation middleware for query parameters
+// I define validation middleware for query parameters
 const validateQueryParams = [
   query('page')
     .optional()
@@ -104,7 +104,7 @@ const validateQueryParams = [
     }
     next();
   }
-]; 
+];
 
 module.exports = {
   validateCreateTask,
