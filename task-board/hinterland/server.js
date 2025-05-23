@@ -61,33 +61,11 @@ process.on('unhandledRejection', (err) => {
  */
 const connectDB = async () => {
   try {
-    // I try to connect to MongoDB Atlas first
-    const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://letsfkingo07:CtokNVH3iVcrUYPz@cluster009099.djatxzd.mongodb.net/';
+    const MONGO_URI = 'mongodb+srv://letsfkingo07:CtokNVH3iVcrUYPz@cluster009099.djatxzd.mongodb.net/task-board';
     
-    console.log('Attempting to connect to MongoDB Atlas...');
-    try {
-      await mongoose.connect(MONGO_URI);
-      console.log('Connected to MongoDB Atlas successfully');
-    } catch (atlasError) {
-      console.warn('Could not connect to MongoDB Atlas:', atlasError.message);
-      console.warn('IP Address may not be whitelisted. Falling back to local MongoDB...');
-      
-      // Fallback to localhost if available
-      try {
-        await mongoose.connect('mongodb://localhost:27017/task-board');
-        console.log('Connected to local MongoDB successfully');
-      } catch (localError) {
-        console.warn('Could not connect to local MongoDB:', localError.message);
-        console.warn('Using in-memory MongoDB for development...');
-        
-        // As a last resort, set up an in-memory MongoDB server for development
-        const { MongoMemoryServer } = require('mongodb-memory-server');
-        const mongod = await MongoMemoryServer.create();
-        const uri = mongod.getUri();
-        await mongoose.connect(uri);
-        console.log('Connected to in-memory MongoDB successfully');
-      }
-    }
+    console.log('Connecting to MongoDB Atlas...');
+    await mongoose.connect(MONGO_URI);
+    console.log('Connected to MongoDB Atlas successfully');
     
     // I set up MongoDB connection event listeners
     mongoose.connection.on('error', err => {

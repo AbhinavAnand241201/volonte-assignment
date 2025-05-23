@@ -1,3 +1,0 @@
-PORT=3333
-MONGO_URI=mongodb+srv://letsfkingo07:CtokNVH3iVcrUYPz@cluster009099.djatxzd.mongodb.net/task-board
-NODE_ENV=development
